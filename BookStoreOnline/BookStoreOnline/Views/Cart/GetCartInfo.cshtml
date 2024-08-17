@@ -1,0 +1,80 @@
+﻿@using BookStoreOnline.Models;
+@model List<CartItem>
+@{
+    ViewBag.Title = "GetCartInfo";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@{
+    var price = System.Globalization.CultureInfo.GetCultureInfo("vi-VN");
+    var user = Session["TaiKhoan"] as BookStoreOnline.Models.Customer;
+}
+
+<div class="container body-page">
+    <table class="table">
+        <thead>
+            <tr>
+
+                <th scope="col">Sản phẩm</th>
+                <th scope="col">Số lượng</th>
+                <th scope="col">Đơn giá</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+
+            @foreach (var item in Model)
+            {
+                <tr class="prod-list-table">
+
+                    <td class="prod-list-details" style="padding-top: 10px;">
+                        <img src="~/Images/@item.ImagePro" alt="">
+                        <h5>@item.NamePro</h5>
+                    </td>
+                    <td>
+
+                        @using (Html.BeginForm("Update", "Cart", FormMethod.Post, new { @class = "edit-quantity" }))
+                        {
+                            <input type="number" name="Quantity" value="@item.Number" min="1">
+                            <input type="hidden" name="ProductID" value="@item.ProductID" />
+                            <button type="submit"><i class="bi bi-arrow-clockwise"></i></button>
+                        }
+                    </td>
+                    <td>
+                        <h5>@String.Format(price, "{0:c0}", item.FinalPrice())</h5>
+                    </td>
+                    <td><a href="@Url.Action("Remove/"+item.ProductID,"Cart")" class="delete-prod-btn"><i class="bi bi-x-square-fill"></i></a></td>
+                </tr>
+            }
+
+
+
+        </tbody>
+    </table>
+
+    <hr />
+
+    @using (Html.BeginForm("InsertOrder", "Cart", FormMethod.Post, new { @class = "checkout-form" }))
+    {
+        <div class="row infor-order">
+            <div class="col-lg-6">
+                <h5 class="address-title">Thông tin khách hàng</h5>
+                <textarea name="address" placeholder="Vui lòng nhạp số điện thoại và địa chỉ nhận hàng" rows="4" required></textarea>
+            </div>
+            <div class="col-lg-6">
+                <table class="table ">
+                    <tr>
+                        <td>Số lượng sản phẩm</td>
+                        <td>@ViewBag.TotalNumber</td>
+                    </tr>
+                    <tr>
+                        <td>Tổng giá</td>
+                        <td><h4>@String.Format(price, "{0:c0}", ViewBag.TotalPrice)</h4></td>
+                    </tr>
+                </table>
+                <button type="submit" class="checkout-btn">Đặt hàng</button>
+            </div>
+        </div>
+    }
+    </div>
+
